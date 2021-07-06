@@ -15,10 +15,11 @@ class Board
     row.join('')
   end
 
+  # Indexes
   # (-1, -1), (-1,  0), (-1,  1)
   # ( 0, -1), ( 0,  0), ( 0,  1)
   # ( 1, -1), ( 1,  0), ( 1,  1)
-  def self.neighbors(row_index, char_index, board)
+  def self.find_mines(row_index, char_index, board)
     mines = 0
     (row_index-1..row_index+1).each do |r|
       (char_index-1..char_index+1).each do |c|
@@ -32,26 +33,27 @@ class Board
   end
 
   def self.row_check!(row_index, row, board)
-    found = ""
     msg = "rows must be of same length as the first"
     raise(ArgumentError.new msg) if row.length != board.first.length
+
+    transformed = ""
     row.each_with_index do |char, char_index|
       # check edge
       if char_index == 0 || char_index == row.length-1
-        char == '|' ? found += char : raise(ArgumentError.new "rows must end with |")
+        char == '|' ? transformed += char : raise(ArgumentError.new "rows must end with |")
       # check row
       else
         case char
         when '*'
-          found += char
+          transformed += char
         when ' '
-          found += neighbors(row_index, char_index, board).to_s
+          transformed += find_mines(row_index, char_index, board).to_s
         else
           raise ArgumentError.new "row characters must be one of |, *, ' '"
         end
       end
     end
-    found
+    transformed
   end
 
   def self.transform(board)
